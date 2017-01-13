@@ -64,7 +64,7 @@ if(style == 'getLastStatus' || style == 'gls'){
 			})
 			.then(()=>{
 				console.log('write ', pathFile, 'ok');
-				let promises = Promise.resovle();
+				let promises = Promise.resolve();
 				for(let i = 0, l = result.arr.length; i < l; ++i) {
 					tools.makeReq({
 						url: 'http://www.pufei.net' + result.arr[i].href,
@@ -127,4 +127,5 @@ if(style == 'getLastStatus' || style == 'gls'){
 					})		
 			}
 		})
+		.then(()=>{console.log('finished')})
 	}
