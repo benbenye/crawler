@@ -68,7 +68,9 @@ if (style == 'checkUpdate') {
       .then((data)=> {
         let objData = JSON.parse(data.toString());
         console.log(
-          '本地进度:',
+          '上次抓取位置:',
+          objData.last,
+          '\n本地进度:',
           objData.allList[0].title,
           '\n抓取进度:',
           tools.dealListHtml(list.text)[0].title
@@ -89,7 +91,8 @@ getList()
     console.log('------------总共', result.arr.length, '章节--------------');
 
     //  打log 记录章节列表已成功抓取
-    return tools.writeLogJson(pathFile, JSON.stringify({last: [0, 0], allList: result.arr}))
+    console.log('打log 记录章节列表已成功抓取')
+    return tools.writeLogJson(pathFile, {last: [0, 0], allList: result.arr})
   })
   .then(() => {
     //  根据章节列表抓取对应章节下的图片列表
@@ -100,7 +103,8 @@ getList()
           e.pic = tools.dealPicListHtml(res.text)
 
           //  打log 记录章节对应的图片链接已成功抓取
-          return tools.writeLogJson(pathFile, JSON.stringify({last: [i, 0], allList: result.arr}))
+          console.log('打log 记录章节对应的图片链接已成功抓取')
+          return tools.writeLogJson(pathFile, {last: [i, 0], allList: result.arr})
         })
         .then(()=> {
           // 抓取图片
@@ -113,20 +117,23 @@ getList()
                   last: [i, j],
                   allList: result.arr,
                   body: res.body,
-                  imgPath:_path.join('imgfile2', e.title, j + '.jpg'),
+                  imgPath: _path.join('imgfile2', e.title, j + '.jpg'),
                   path: _path.join('imgfile2', e.title)
                 })
               })
               .catch(err=> {
-                console.error('图片:', i, '-', j, err.message)
+                return console.error('图片:', i, '-', j, err.message)
               })
-              .then(()=>{
-                return setTimeout(()=>{},2000+Math.random())
+              .then(()=> {
+                console.log('waiting');
+                return new Promise((res, rej) => {
+                  setTimeout(res, 2000 + Math.random())
+                });
               })
           })
         })
     })
   })
-  .then(()=>{
+  .then(()=> {
     console.log('finished!')
   })

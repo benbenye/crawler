@@ -88,22 +88,23 @@ exports.forEachTask = function (arr, fun) {
 }
 
 exports.saveFile = function (option) {
-  return exports.writeLogJson(option.logPath, JSON.stringify({last: option.last, allList: option.allList}))
+  console.log('打log 记录章节对应的图片已成功抓取')
+  return exports.writeLogJson(option.logPath, {last: option.last, allList: option.allList})
     .then(()=> {
       return writeFileAsync(option.imgPath, option.body)
         .then(()=> {
-          console.log('write img: ' + option.imgPath);
+          return console.log('write img: ' + option.imgPath);
         })
         .catch(err=> {
           return mkdirAsync(option.path)
             .then(()=> {
               return writeFileAsync(option.imgPath, option.body)
                 .then(()=> {
-                  console.log('retry write img: ' + option.imgPath + 'OK!');
+                  return console.log('retry write img: ' + option.imgPath + 'OK!');
                 })
             })
             .catch(err=> {
-              console.log('write img retry fail' + err.message);
+              return console.log('write img retry fail' + err.message);
             })
         })
     })
