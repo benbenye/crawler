@@ -100,7 +100,7 @@ getList()
           e.pic = tools.dealPicListHtml(res.text)
 
           //  打log 记录章节对应的图片链接已成功抓取
-          return tools.writeLogJson(pathFile, JSON.stringify({last: [e, 0], allList: result.arr}))
+          return tools.writeLogJson(pathFile, JSON.stringify({last: [i, 0], allList: result.arr}))
         })
         .then(()=> {
           // 抓取图片
