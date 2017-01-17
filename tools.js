@@ -19,6 +19,9 @@ exports.promisify = function (func, option = {}) {
   })
 };
 
+const writeFileAsync = exports.promisify(fs.writeFile);
+const mkdirAsync = exports.promisify(fs.mkdir);
+
 //	获取章节列表,
 exports.dealListHtml = function (text) {
   let $ = cheerio.load(text)
@@ -46,8 +49,7 @@ exports.dealPicListHtml = function (text) {
 };
 
 exports.writeLogJson = function (path, content) {
-  const writeFileAsync = this.promisify(fs.writeFile);
-  writeFileAsync(_path.join(path), JSON.stringify(content))
+  return writeFileAsync(_path.join(path), JSON.stringify(content))
     .then(function () {
       console.log('write ', path, 'ok')
     })
@@ -73,4 +75,36 @@ exports.makeReq = function (option) {
     _req.charset('gbk');
   }
   return _req;
+}
+
+exports.forEachTask = function (arr, fun) {
+  let promise = Promise.resolve();
+  arr.forEach((a, i) => {
+    promise = promise.then(() => {
+      return fun(a, i);
+    });
+  });
+  return promise;
+}
+
+exports.saveFile = function (option) {
+  return exports.writeLogJson(option.logPath, JSON.stringify({last: option.last, allList: option.allList}))
+    .then(()=> {
+      return writeFileAsync(option.imgPath, option.body)
+        .then(()=> {
+          console.log('write img: ' + option.imgPath);
+        })
+        .catch(err=> {
+          return mkdirAsync(option.path)
+            .then(()=> {
+              return writeFileAsync(option.imgPath, option.body)
+                .then(()=> {
+                  console.log('retry write img: ' + option.imgPath + 'OK!');
+                })
+            })
+            .catch(err=> {
+              console.log('write img retry fail' + err.message);
+            })
+        })
+    })
 }
